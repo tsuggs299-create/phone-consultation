@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Phone Consultation Scheduling</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -56,69 +55,69 @@
 </head>
 <body>
 
-  <div class="container">
-    <h1>Phone Consultation for Whole Home Energy Assessment</h1>
+<div class="container">
+  <h1>Phone Consultation for Whole Home Energy Assessment</h1>
 
-    <form id="consultation-form">
-      <label>Date</label>
-      <input type="date" id="date" required>
+  <form onsubmit="submitRequest(event)">
+    <label>Date</label>
+    <input type="date" id="date" required>
 
-      <label>Time</label>
-      <input type="time" id="time" required>
+    <label>Time</label>
+    <input type="time" id="time" required>
 
-      <label>Full Name</label>
-      <input type="text" id="name" required>
+    <label>Full Name</label>
+    <input type="text" id="name" required>
 
-      <label>Phone Number</label>
-      <input type="tel" id="phone" required>
+    <label>Phone Number</label>
+    <input type="tel" id="phone" required>
 
-      <label>Email Address</label>
-      <input type="email" id="email" required>
+    <label>Email Address</label>
+    <input type="email" id="email" required>
 
-      <label>Notes (optional)</label>
-      <textarea id="notes" rows="3"></textarea>
+    <label>Notes (optional)</label>
+    <textarea id="notes"></textarea>
 
-      <button type="submit">Submit Request</button>
-    </form>
+    <button type="submit">Submit Request</button>
+  </form>
 
-    <div class="note">
-      Your request will be reviewed and confirmed.
-    </div>
+  <div class="note">
+    Your request will be reviewed and confirmed.
   </div>
+</div>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabase = supabase.createClient(
+    https://pnlmumzvflehdfbtktss.supabase.co,
+    sb_publishable_C9DKKPAXrQQ27HA1atj7Ow_PUy4m_DZ
+  );
 
-  <script>
-    const supabase = supabase.createClient(
-      https://pnlmumzvflehdfbtktss.supabase.co,
-      sb_publishable_C9DKKPAXrQQ27HA1atj7Ow_PUy4m_DZ
-    );
+  async function submitRequest(e) {
+    e.preventDefault();
 
-    document.getElementById("consultation-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("time").value;
 
-      const { error } = await supabase
-        .from("appointments")
-        .insert([{
-          name: document.getElementById("name").value,
-          phone: document.getElementById("phone").value,
-          email: document.getElementById("email").value,
-          date: document.getElementById("date").value,
-          time: document.getElementById("time").value,
-          notes: document.getElementById("notes").value,
-          status: "pending"
-        }]);
+    await supabase
+      .from("availability")
+      .update({ status: "held" })
+      .eq("date", date)
+      .eq("time", time);
 
-      if (error) {
-        alert("Error submitting request");
-        console.error(error);
-      } else {
-        alert("Request submitted. We will confirm shortly.");
-        document.getElementById("consultation-form").reset();
-      }
-    });
-  </script>
+    await supabase.from("appointments").insert([{
+      name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      email: document.getElementById("email").value,
+      notes: document.getElementById("notes").value,
+      date,
+      time,
+      status: "pending"
+    }]);
+
+    alert("Request submitted. Time is now held.");
+    e.target.reset();
+  }
+</script>
 
 </body>
 </html>
