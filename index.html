@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Phone Consultation Scheduling</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -58,24 +59,24 @@
   <div class="container">
     <h1>Phone Consultation for Whole Home Energy Assessment</h1>
 
-    <form>
+    <form id="consultation-form">
       <label>Date</label>
-      <input type="date" required>
+      <input type="date" id="date" required>
 
       <label>Time</label>
-      <input type="time" required>
+      <input type="time" id="time" required>
 
       <label>Full Name</label>
-      <input type="text" required>
+      <input type="text" id="name" required>
 
       <label>Phone Number</label>
-      <input type="tel" required>
+      <input type="tel" id="phone" required>
 
       <label>Email Address</label>
-      <input type="email" required>
+      <input type="email" id="email" required>
 
       <label>Notes (optional)</label>
-      <textarea rows="3"></textarea>
+      <textarea id="notes" rows="3"></textarea>
 
       <button type="submit">Submit Request</button>
     </form>
@@ -84,75 +85,40 @@
       Your request will be reviewed and confirmed.
     </div>
   </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-  const supabase = supabase.createClient(
-  "PASTE_YOUR_PROJECT_URL_HERE",
-  "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
-);
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <script>
+    const supabase = supabase.createClient(
+      "PASTE_YOUR_PROJECT_URL_HERE",
+      "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+    );
 
-  async function loadAvailability() {
-    const { data, error } = await supabase
-      .from("availability")
-      .select("*")
-      .eq("status", "available");
+    document.getElementById("consultation-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    if (error) {
-      alert("Error loading availability");
-      return;
-    }
+      const { error } = await supabase
+        .from("appointments")
+        .insert([{
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          email: document.getElementById("email").value,
+          date: document.getElementById("date").value,
+          time: document.getElementById("time").value,
+          notes: document.getElementById("notes").value,
+          status: "pending"
+        }]);
 
-    const container = document.getElementById("times");
-    container.innerHTML = "";
-
-    data.forEach(slot => {
-      const btn = document.createElement("button");
-      btn.innerText = `${slot.date} – ${slot.time}`;
-      btn.onclick = () => selectSlot(slot);
-      container.appendChild(btn);
+      if (error) {
+        alert("Error submitting request");
+        console.error(error);
+      } else {
+        alert("Request submitted. We will confirm shortly.");
+        document.getElementById("consultation-form").reset();
+      }
     });
-  }
-
-  let selectedSlot = null;
-
-  function selectSlot(slot) {
-    selectedSlot = slot;
-    document.getElementById("selected").innerText =
-      `Selected: ${slot.date} at ${slot.time}`;
-  }
-
-  async function submitRequest() {
-    if (!selectedSlot) {
-      alert("Please select a time");
-      return;
-    }
-
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-    const email = document.getElementById("email").value;
-
-    await supabase
-      .from("availability")
-      .update({ status: "held" })
-      .eq("id", selectedSlot.id);
-
-    await supabase.from("appointments").insert([{
-      name,
-      phone,
-      email,
-      date: selectedSlot.date,
-      time: selectedSlot.time,
-      status: "pending"
-    }]);
-
-    alert("Request received. Pending confirmation.");
-    loadAvailability();
-  }
-
-  loadAvailability();
-</script>
+  </script>
 
 </body>
 </html>
