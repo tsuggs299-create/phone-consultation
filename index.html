@@ -42,9 +42,6 @@
       border: none;
       cursor: pointer;
     }
-    button:hover {
-      opacity: 0.9;
-    }
     .note {
       font-size: 12px;
       color: #555;
@@ -87,7 +84,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabase = supabase.createClient(
+  const supabaseClient = supabase.createClient(
     https://pnlmumzvflehdfbtktss.supabase.co,
     sb_publishable_C9DKKPAXrQQ27HA1atj7Ow_PUy4m_DZ
   );
@@ -98,21 +95,33 @@
     const date = document.getElementById("date").value;
     const time = document.getElementById("time").value;
 
-    await supabase
+    const updateResult = await supabaseClient
       .from("availability")
       .update({ status: "held" })
       .eq("date", date)
       .eq("time", time);
 
-    await supabase.from("appointments").insert([{
-      name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      email: document.getElementById("email").value,
-      notes: document.getElementById("notes").value,
-      date,
-      time,
-      status: "pending"
-    }]);
+    if (updateResult.error) {
+      alert(updateResult.error.message);
+      return;
+    }
+
+    const insertResult = await supabaseClient
+      .from("appointments")
+      .insert([{
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        notes: document.getElementById("notes").value,
+        date,
+        time,
+        status: "pending"
+      }]);
+
+    if (insertResult.error) {
+      alert(insertResult.error.message);
+      return;
+    }
 
     alert("Request submitted. Time is now held.");
     e.target.reset();
