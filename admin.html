@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 6px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    input, button {
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+    }
+    th {
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+
+    <div class="section">
+      <h3>Available Dates & Times</h3>
+      <p>(Availability controls will appear here)</p>
+    </div>
+
+    <div class="section">
+      <h3>Appointment Requests</h3>
+
+      <table>
+        <tr>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>Pending</td>
+          <td>Confirm | Decline</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>
